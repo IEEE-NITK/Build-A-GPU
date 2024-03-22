@@ -20,16 +20,10 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Processor(
-               clk,
-               reset,
-               instruction,
-               x_out,
-               y_out                  
-    );
+module Processor(clk,reset,instruction,x_out,y_out);
     
-input [35:0] instruction;
 input clk,reset;
+input [35:0] instruction;
 output signed [8:0]x_out;
 output signed [7:0]y_out;
 
@@ -44,34 +38,9 @@ wire signed [8:0]x1,x2;
 wire signed [7:0]y1,y2;
 wire done;
 
-Instruction_decoder ins(.instruction(instruction),
-                        .ctrl_ALU(ctrl_ALU),
-                        .x1(x1),
-                        .x2(x2),
-                        .y1(y1),
-                        .y2(y2));
-                        
-/*bresenham_lda line(.clk(clk),
-                              .reset(reset),
-                              .draw(draw),
-                              .x1(x1),
-                              .x2(x2),
-                              .y1(y1),
-                              .y2(y2),
-                              .ctrl_ALU(ctrl_ALU),
-                              .x_out(x_out),
-                              .y_out(y_out),
-                              .done(done));*/
 
-Circle_Draw_1 circle(.clk(clk),
-                               .reset(reset),
-                               .xc(x1),
-                               .yc(y1),
-                               .r(x2),
-                               .ctrl_ALU(ctrl_ALU),
-                               .x_out(x_out),
-                               .y_out(y_out),
-                               .done(done));
+Instruction_decoder ins(.instruction(instruction),.reset(reset),.done_in(done),.ctrl_ALU(ctrl_ALU),.x1(x1),.x2(x2),.y1(y1),.y2(y2),.done_out(done));
+//bresenham_lda line(.clk(clk),.reset(reset),.draw(draw),.x1(x1),.y1(y1),.x2(x2),.y1(y1),.done_in(done),.ctrl_ALU(ctrl_ALU),.x_out(x_out),.y_out(y_out),.done_out(done));
+Circle_Draw_1 circle(.clk(clk),.reset(reset),.xc(x1),.yc(y1),.r(x2),.done_in(done),.ctrl_ALU(ctrl_ALU),.x_out(x_out),.y_out(y_out),.done_out(done));
 
 endmodule
-

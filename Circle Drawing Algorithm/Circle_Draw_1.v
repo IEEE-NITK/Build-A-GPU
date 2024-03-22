@@ -26,10 +26,11 @@ module Circle_Draw_1 (
     input signed [8:0] xc,
     input signed [7:0] yc,
     input [8:0] r,
-    input ctrl_ALU,
+    input wire done_in,
+    input [2:0] ctrl_ALU,
     output reg signed [8:0] x_out,
     output reg signed [7:0] y_out,
-    output reg done
+    output reg done_out
 );
 
 reg signed [8:0] p;
@@ -37,20 +38,26 @@ reg signed [8:0] x;
 reg signed [7:0] y;
 reg [3:0] state;
 parameter start=4'd9, finish=4'd10;
-
+initial state=start;
 always @(posedge clk or posedge reset) begin
-    if (ctrl_ALU==3'b110) begin
-        if (reset) begin
+    if (reset) begin
             x <= 0;
-            y <= r;
-            p <= 2'd3-(2*r);
-            state <= 4'd0;
-            done<=0;  
-        end 
-        else begin
-            if (!done) begin
+            y <= 0;
+            p <= 0;
+            state <= start;
+            done_out<=0;  
+    end 
+     else if (ctrl_ALU==3'b110) begin
+            if (!done_in || !done_out) begin
                 if (x <= y) begin
                     case (state)
+                        start: begin
+                            x <= 0;
+                            y <= r;
+                            p <= 2'd3-(2*r);
+                            state <= 4'd0;
+                            done_out<=0; 
+                        end
                         4'd0: begin
                             x_out <= xc + x;
                             y_out <= yc + y;
@@ -100,7 +107,6 @@ always @(posedge clk or posedge reset) begin
                             end
                             state <= 4'd0;
                         end
-                            
                     endcase
                 end
                 else begin
@@ -108,11 +114,9 @@ always @(posedge clk or posedge reset) begin
                     y<=0;
                     x_out<=0;
                     y_out<=0;
-                    done<=1;
+                    done_out<=1;
                 end
             end
         end
     end
-end
-
 endmodule
