@@ -39,16 +39,16 @@ reg signed [7:0] y;
 reg [3:0] state;
 parameter start=4'd9, finish=4'd10;
 initial state=start;
+initial x=0;
+initial y=0;
+initial p =0;
+initial done_out=0;
 always @(posedge clk or posedge reset) begin
+    if (ctrl_ALU==3'b110) begin
     if (reset) begin
-            x <= 0;
-            y <= 0;
-            p <= 0;
-            state <= start;
             done_out<=0;  
     end 
-     else if (ctrl_ALU==3'b110) begin
-            if (!done_in || !done_out) begin
+    else if (!done_in || !done_out) begin
                 if (x <= y) begin
                     case (state)
                         start: begin

@@ -81,3 +81,4 @@ always @(instruction or posedge reset) begin
     end
 end
 endmodule
+

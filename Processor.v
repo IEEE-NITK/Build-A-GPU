@@ -38,9 +38,10 @@ wire signed [8:0]x1,x2;
 wire signed [7:0]y1,y2;
 wire done;
 
+//comment out line_draw if you are using circle_draw and vice versa
 
 Instruction_decoder ins(.instruction(instruction),.reset(reset),.done_in(done),.ctrl_ALU(ctrl_ALU),.x1(x1),.x2(x2),.y1(y1),.y2(y2),.done_out(done));
-//bresenham_lda line(.clk(clk),.reset(reset),.draw(draw),.x1(x1),.y1(y1),.x2(x2),.y1(y1),.done_in(done),.ctrl_ALU(ctrl_ALU),.x_out(x_out),.y_out(y_out),.done_out(done));
+//Line_Draw line(.clk(clk),.reset(reset),.x1(x1),.y1(y1),.x2(x2),.y2(y2),.done_in(done),.ctrl_ALU(ctrl_ALU),.x_out(x_out),.y_out(y_out),.done_out(done));
 Circle_Draw_1 circle(.clk(clk),.reset(reset),.xc(x1),.yc(y1),.r(x2),.done_in(done),.ctrl_ALU(ctrl_ALU),.x_out(x_out),.y_out(y_out),.done_out(done));
 
 endmodule

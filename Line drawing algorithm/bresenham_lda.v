@@ -24,10 +24,11 @@ module bresenham_lda(
     input clk,
     input reset,
     input draw,
+    input wire done_in,
     input [9:0] x1, y1, x2, y2,
     input ctrl_ALU,
     output reg [9:0] x_out, y_out,
-    output reg done
+    output reg done_out
 );
 
 localparam [1:0] IDLE = 2'b00, DRAW = 2'b01, DONE = 2'b10;
@@ -56,69 +57,71 @@ always @(posedge clk or posedge reset) begin
 end
 always @(*) begin
     if(ctrl_ALU==3'b100) begin
-        case (state)
-            IDLE: begin
-                if (x1 != x2 || y1 != y2) begin
-                    dx <= x2 - x1;
-                    dy <= y2 - y1;
-                    m <= dy/dx;
-                    x_next <= x1;
-                    y_next <= y1;
-                    p_next <= 2 * dy - dx;
-                    if (draw) begin
-                        next_state <= DRAW;
-                        done<=0;
+        if (!done_in || !done_out) begin
+            case (state)
+                IDLE: begin
+                    if (x1 != x2 || y1 != y2) begin
+                        dx <= x2 - x1;
+                        dy <= y2 - y1;
+                        m <= dy/dx;
+                        x_next <= x1;
+                        y_next <= y1;
+                        p_next <= 2 * dy - dx;
+                        if (draw) begin
+                            next_state <= DRAW;
+                            done_out<=0;
+                        end
+                        else begin
+                            next_state <= IDLE;
+                        end
                     end
                     else begin
                         next_state <= IDLE;
                     end
                 end
-                else begin
+                DRAW: begin
+                    if (x == x2 && y == y2) begin
+                        next_state <= DONE;
+                    end
+                    else if (p < 0 && m < 1) begin
+                        p_next <= p + 2 * dy;
+                        x_next <= x + 1;
+                        y_next <= y;
+                        x_out <= x_next;
+                        y_out <= y_next;
+                        next_state <= DRAW;
+                    end
+                    else if(p>=0 && m < 1) begin
+                        p_next <= p + 2 * (dy - dx);
+                        x_next <= x + 1;
+                        y_next <= y + 1;
+                        x_out <= x_next;
+                        y_out <= y_next;
+                        next_state <= DRAW;
+                    end
+                    else if(p < 0 && m>=1) begin
+                        p_next <= p + 2 * dx;
+                        x_next <= x + 1;
+                        y_next <= y + 1;
+                        x_out <= x_next;
+                        y_out <= y_next;
+                        next_state <= DRAW;
+                    end
+                    else begin
+                        p_next <= p + 2 * (dx - dy);
+                        x_next <= x;
+                        y_next <= y + 1;
+                        x_out <= x_next;
+                        y_out <= y_next;
+                        next_state <= DRAW;
+                    end
+                end
+                DONE: begin
                     next_state <= IDLE;
+                    done_out<=1;
                 end
-            end
-            DRAW: begin
-                if (x == x2 && y == y2) begin
-                    next_state <= DONE;
-                end
-                else if (p < 0 && m < 1) begin
-                    p_next <= p + 2 * dy;
-                    x_next <= x + 1;
-                    y_next <= y;
-                    x_out <= x_next;
-                    y_out <= y_next;
-                    next_state <= DRAW;
-                end
-                else if(p>=0 && m < 1) begin
-                    p_next <= p + 2 * (dy - dx);
-                    x_next <= x + 1;
-                    y_next <= y + 1;
-                    x_out <= x_next;
-                    y_out <= y_next;
-                    next_state <= DRAW;
-                end
-                else if(p < 0 && m>=1) begin
-                    p_next <= p + 2 * dx;
-                    x_next <= x + 1;
-                    y_next <= y + 1;
-                    x_out <= x_next;
-                    y_out <= y_next;
-                    next_state <= DRAW;
-                end
-                else begin
-                    p_next <= p + 2 * (dx - dy);
-                    x_next <= x;
-                    y_next <= y + 1;
-                    x_out <= x_next;
-                    y_out <= y_next;
-                    next_state <= DRAW;
-                end
-            end
-            DONE: begin
-                next_state <= IDLE;
-                done<=1;
-            end
-        endcase
+            endcase
+         end
      end
 end
 
