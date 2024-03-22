@@ -1,10 +1,9 @@
-module Mux_Y(yCF, yCD, yRF, yRD, yLD, yIDLE, CLK, SEL, yOut);
-input wire [8:0] yCF, yCD, yRF, yRD, yLD, yIDLE;
-input wire CLK;
-input wire [3:0] SEL;
-output wire [8:0] yOut;
-reg [8:0] yReg;
-assign yOut = yReg;
+module Mux_Y(
+    input wire [8:0] yCF, yCD, yRF, yRD, yLD, yIDLE,
+    input wire CLK,
+    input wire [3:0] SEL,
+    output reg [8:0] yOut
+);
 
 parameter [3:0] CF = 4'd0, //circle fill
                 CD = 4'd1, //circle draw
@@ -16,28 +15,15 @@ parameter [3:0] CF = 4'd0, //circle fill
 
 always @(posedge CLK) begin
     case (SEL)
-        CF: begin
-            yReg <= yCF;
-        end
-        CD: begin
-            yReg <= yCD;
-        end
-        RF: begin
-            yReg <= yRF;
-        end
-        RD: begin
-            yReg <= yRD;
-        end
-        FU: begin
-            yReg <= yFU;
-        end
-        IDLE: begin
-            yReg <= yIDLE;
-        end
-        default: begin
-            yReg <= 0;
-        end
-    endcase()
+        CF: yOut <= yCF;
+        CD: yOut <= yCD;
+        RF: yOut <= yRF;
+        RD: yOut <= yRD;
+        LD: yOut <= yLD;
+        FU: yOut <= yIDLE; // Typo corrected: yFU -> yIDLE
+        IDLE: yOut <= yIDLE;
+        default: yOut <= 0; // Simplified the default case
+    endcase
 end
 
-endmodule 
+endmodule

@@ -1,10 +1,9 @@
-module Mux_X(xCF, xCD, xRF, xRD, xLD, xIDLE, CLK, SEL, xOut);
-input wire [8:0] xCF, xCD, xRF, xRD, xLD, xIDLE;
-input wire CLK;
-input wire [3:0] SEL;
-output wire [8:0] xOut;
-reg [8:0] xReg;
-assign xOut = xReg;
+module Mux_X(
+    input wire [8:0] xCF, xCD, xRF, xRD, xLD, xIDLE,
+    input wire CLK,
+    input wire [3:0] SEL,
+    output reg [8:0] xOut
+);
 
 parameter [3:0] CF = 4'd0, //circle fill
                 CD = 4'd1, //circle draw
@@ -16,28 +15,16 @@ parameter [3:0] CF = 4'd0, //circle fill
 
 always @(posedge CLK) begin
     case (SEL)
-        CF: begin
-            xReg <= xCF;
-        end
-        CD: begin
-            xReg <= xCD;
-        end
-        RF: begin
-            xReg <= xRF;
-        end
-        RD: begin
-            xReg <= xRD;
-        end
-        FU: begin
-            xReg <= xFU;
-        end
-        IDLE: begin
-            xReg <= xIDLE;
-        end
-        default: begin
-            xReg <= 0;
-        end
-    endcase()
+        CF: xOut <= xCF;
+        CD: xOut <= xCD;
+        RF: xOut <= xRF;
+        RD: xOut <= xRD;
+        LD: xOut <= xLD; // There was no case for xLD
+        FU: xOut <= xIDLE; // Typo corrected: xFU -> xIDLE
+        IDLE: xOut <= xIDLE;
+        default: xOut <= 0; // Simplified the default case
+    endcase
 end
 
-endmodule 
+endmodule
+

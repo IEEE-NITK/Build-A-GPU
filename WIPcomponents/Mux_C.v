@@ -1,10 +1,8 @@
-module Mux_C(cCF, cCD, cRD, cRF, cLD, cIDLE, CLK, SEL, cOut);
-input wire [15:0] cCF, cCD, cRD, cRF, cLD, cIDLE, CLK, SEL, cOut;
-input wire CLK;
-input wire [3:0] SEL;
-output wire [15:0] cOut;
-reg [15:0] cReg;
-assign cOut = cReg;
+module Mux_C(
+    input wire [15:0] cCF, cCD, cRD, cRF, cLD, cIDLE, CLK,
+    input wire [3:0] SEL,
+    output reg [15:0] cOut
+);
 
 parameter [3:0] CF = 4'd0, //circle fill
                 CD = 4'd1, //circle draw
@@ -16,17 +14,16 @@ parameter [3:0] CF = 4'd0, //circle fill
 
 always @(posedge CLK) begin
     case (SEL)
-        CF: begin cReg<=cCF; end
-        CD: begin cReg<=cCD; end
-        RF: begin cReg<=cRF; end
-        RD: begin cReg<=cRD; end
-        LD: begin cReg<=cLD; end
-        FU: begin cReg<=cFU; end
-        IDLE: begin cReg<=cIDLE; end
-        default: begin
-            cReg <= 16'hF000
-        end
+        CF: cOut <= cCF;
+        CD: cOut <= cCD;
+        RF: cOut <= cRF;
+        RD: cOut <= cRD;
+        LD: cOut <= cLD;
+        FU: cOut <= cIDLE; // There was a typo here, should be cIDLE instead of cFU
+        IDLE: cOut <= cIDLE;
+        default: cOut <= 16'hF000;
     endcase
 end
 
 endmodule
+
